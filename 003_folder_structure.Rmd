@@ -1,0 +1,24 @@
+# Folder structures
+
+```{r afbeeldingen inladen}
+library(png)
+library(grid)
+library(gridExtra)
+library(here)
+
+
+daur2_fs <- rasterGrob(as.raster(readPNG(here("Figures/DAUR2_fs.png"))))
+workflows_fs <-  rasterGrob(as.raster(readPNG(here("Figures/workflows_fs_.png"))))
+```
+
+
+## Folder structure of DAUR2:
+```{r daur2 fs}
+grid.arrange(daur2_fs)
+```
+
+
+## Folder structure of workflows (at time of making folder structure):
+```{r workflows fs}
+grid.arrange(workflows_fs)
+```
