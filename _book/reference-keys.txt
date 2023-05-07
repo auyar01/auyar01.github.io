@@ -1,0 +1,6 @@
+portfolio-opdrachten-bookdown
+effects-of-different-compounds-on-c.elegans-offspring
+transparency-criteria
+folder-structures
+folder-structure-of-daur2
+folder-structure-of-workflows-at-time-of-making-folder-structure
