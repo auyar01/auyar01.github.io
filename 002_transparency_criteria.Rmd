@@ -57,7 +57,7 @@ __Question 3:__ Taken together on a scale from 1 (very hard) to 5 (very easy), h
 __Answer 3:__ I would grade it a 5. The only thing that had to be changed was the path for the inputfile.
 
 
-```{r plot auteur namaken}
+```{r plot_auteur_namaken}
 ### Monitoring trends and differences in COVID-19 case fatality  ##############
 ### rates using decomposition methods: A demographic perspective ##############
 
