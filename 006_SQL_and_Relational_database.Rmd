@@ -1,0 +1,227 @@
+# SQL and relational database in Dbeaver
+
+In this report, the focus is on showcasing my skills in SQL. I have used the database management tool Dbeaver to save my tables in.
+
+
+```{r loading libraries here, message = F}
+library(readr)
+library(stringr)
+library(tidyverse)
+library(dslabs)
+library(RPostgreSQL)
+library(png)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(here)
+```
+
+
+In the chunk of R code below, I have loaded in the data from github. I have transformed the data into tidy format and made variables coincide with eachtother to merge them later on. 
+
+```{r loading data and transform to tidy form}
+# Load data 
+flu_df <- read.csv(file = "https://raw.githubusercontent.com/DataScienceILC/tlsc-dsfb26v-20_workflows/main/data/flu_data.csv", skip = 11)
+
+dengue_df <- read.csv(file = "https://raw.githubusercontent.com/DataScienceILC/tlsc-dsfb26v-20_workflows/main/data/dengue_data.csv", skip = 11)
+
+
+
+# Transform data to tidy form and make variables country and date coincide with eachother 
+flu_df_tidy <- flu_df %>% pivot_longer(cols = -Date, names_to = "country", values_to = "flu_count") %>% na.omit()
+
+dengue_df_tidy <- dengue_df %>% pivot_longer(cols = -Date, names_to = "country", values_to = "dengue_count") %>% na.omit()
+
+dengue_df_tidy$dengue_count <- dengue_df_tidy$dengue_count * 1000
+dengue_df_tidy$dengue_count <- as.integer(dengue_df_tidy$dengue_count)
+
+dengue_df_tidy$country <- as.factor(dengue_df_tidy$country)
+flu_df_tidy$country <- as.factor(flu_df_tidy$country)
+
+
+
+flu_df_tidy$Date <- str_sub(flu_df_tidy$Date, start = 1, end = 4)
+dengue_df_tidy$Date <- str_sub(dengue_df_tidy$Date, start = 1, end = 4)
+
+colnames(flu_df_tidy)[1] <- "year"
+colnames(dengue_df_tidy)[1] <- "year"
+
+flu_df_tidy$year <- as.integer(flu_df_tidy$year)
+dengue_df_tidy$year <- as.integer(dengue_df_tidy$year)
+
+# Inspecting the data using the dplyr package
+head(flu_df_tidy)
+
+head(dengue_df_tidy)
+
+# saving the 3 dataframes as rds and csv files 
+saveRDS(flu_df_tidy, file = here("Data/flu.rds"))
+saveRDS(dengue_df_tidy, file = here("Data/dengue.rds"))
+saveRDS(gapminder, file = here("Data/gapminder.rds"))
+
+write.csv(flu_df_tidy, file = here("Data/flu.csv"), row.names = F)
+write.csv(dengue_df_tidy, file = here("Data/dengue.csv"), row.names = F)
+write.csv(gapminder, file = here("Data/gapminder.csv"), row.names = F)
+``` 
+
+In the chunk below I have connected to a newly created database named workflowsdb and written my dataframes from R to it. 
+
+```{r connect to database and add tables}
+
+# I made a database named "workflowsdb" before connecting to workflowsdb, by putting the following code into the SQL console in Dbeaver: CREATE DATABASE workflowsdb
+
+# Connect to database
+con <- dbConnect(RPostgres::Postgres(), 
+                 dbname = "workflowsdb", 
+                 host="localhost", 
+                 port="5432", 
+                 user="postgres", 
+                 password= params$password) 
+
+#SQL scripts for writing tables to database from dataframes.
+dbWriteTable(con, "flu_table", flu_df_tidy, overwrite = T)
+dbWriteTable(con, "dengue_table", dengue_df_tidy, overwrite = T)
+dbWriteTable(con, "gapminder_table", gapminder, overwrite = T)
+
+```
+
+In the following 3 chunks I inspected the data in the tables that are in database workflowsdb located in Dbeaver.
+
+```{sql viewing contents flu_table, connection = con}
+SELECT 
+  *
+FROM 
+  flu_table
+  
+```
+
+```{sql viewing contents dengue_table, connection = con}
+SELECT 
+  * 
+FROM
+  dengue_table
+```
+
+```{sql viewing contents gapminder_table, connection = con}
+SELECT
+  * 
+FROM 
+  gapminder_table
+```
+
+
+Below, a picture of a saved file containing the SQL scripts written above for inspecting the tables' data.
+
+
+```{r saving SQL scripts file}
+
+saving_scripts_img <- rasterGrob(as.raster(readPNG(here("Figures/scripts_saved.png"))))
+grid.arrange(saving_scripts_img)
+
+```
+
+In the SQL script below, I have merged the three tables together into one table named merged_table with LEFT JOIN. 
+
+```{sql joining the three tables together via country and year, connection = con, eval = F}
+CREATE TABLE 
+  merged_table AS
+SELECT
+gapminder_table.year, gapminder_table.country, gapminder_table.life_expectancy, gapminder_table.infant_mortality, gapminder_table.fertility, gapminder_table.population, gapminder_table.gdp, flu_table.flu_count, dengue_table.dengue_count
+FROM 
+  gapminder_table
+LEFT JOIN
+  flu_table
+ON  
+  gapminder_table.country = flu_table.country
+AND
+  gapminder_table.year = flu_table.year
+LEFT JOIN
+  dengue_table 
+ON 
+  gapminder_table.country = dengue_table.country 
+AND 
+  gapminder_table.year = dengue_table.year 
+
+```
+
+The merged table that I made in the chunk above, I've imported into R and made a couple of simple plots with ggplot().
+
+
+```{r reading merged_table from database to R and ggplotting, warning = F, message = F}
+
+# Reading data 
+merged_table <- read.csv(file = here("Data/merged_table_202305222202.csv"))
+
+merged_table$country <- as.factor(merged_table$country)
+
+
+# Taking only data from countries Bolivia, Mexico and Brazil from years 2010-2015
+merged_table_3 <- merged_table %>% filter(country == "Bolivia" | country == "Mexico" | country == "Brazil",  year %in% c(2010:2015))
+
+# How many flu cases Bolivia, Mexico and Brazil have had in total from 1960-2016  
+# Bolivia's flu cases
+merged_table %>% filter(country == "Bolivia") %>% summarise(sum=sum(flu_count, na.rm = T)) %>% .$sum
+
+# Mexico's flu cases
+merged_table %>% filter(country == "Mexico") %>% summarise(sum=sum(flu_count, na.rm = T)) %>% .$sum
+
+# Brazil's flu cases
+merged_table %>% filter(country == "Brazil") %>% summarise(sum=sum(flu_count, na.rm = T)) %>% .$sum
+
+
+plotting_merged <- merged_table_3 %>% group_by(year, country) %>% summarise(flu_cases=sum(flu_count, na.rm = T), dengue_cases = sum(dengue_count, na.rm = T))
+
+# Plotting flu cases for three countries from 2010-2015  
+flu_plot <- plotting_merged %>% ggplot(aes(x = year, y = flu_cases, colour = country)) + geom_point() + geom_smooth()+ theme_bw() + labs(title = "Flu cases Bolivia, Brazil and Mexico \nfrom 2010-2015", x = "Year", y = "Flu cases")
+
+# Plotting dengue cases for three countries from 2010-2015  
+dengue_plot <- plotting_merged %>% ggplot(aes(x = year, y = dengue_cases, colour = country)) + geom_point() + geom_smooth()+ theme_bw() + labs(title = "Dengue cases Bolivia, Brazil \nand Mexico from 2010-2015", x = "Year", y = "Dengue cases")
+
+
+
+# Filtering for the three countries, without filtering for years
+countries_3 <- merged_table %>% filter(country == "Bolivia" | country == "Mexico" | country == "Brazil")
+
+# obtaining Pearson's cor coefficient between infant mortality and fertility 
+cor_coefficient <- round(cor.test(countries_3$infant_mortality, countries_3$fertility, method = c("pearson"))$estimate,2)
+
+
+relations_plot <- countries_3 %>% ggplot(aes(x = infant_mortality, y = fertility, colour = country)) + geom_point() + theme_bw() + annotate("text", x = 140, y = 4, size=4,
+           label = paste("Pearson's r = ", cor_coefficient)) + labs(title = "Relation between fertility and infant mortality", x = "Infant mortality", y = "Fertility")
+
+
+# Arranging the plots
+ggarrange(flu_plot,dengue_plot,relations_plot, common.legend = T, labels = "AUTO")
+
+```
+
+In plot A and B I have plotted the flu- and dengue cases in Bolivia, Mexico and Brazil respectively from 2010-2015. In Plot C I have plotted the relation between fertility and infant mortality in these countries. The Pearson's correlation coefficient is quite high here, it is `r cor_coefficient`
+
+
+
+
+
+
+
+## Summary of showcased skills
+* General SQL skills (creating tables, creating databases, joining tables and inspecting data in tables)
+* Manipulating multiple tables into tidy format and merging them.
+* Saving csv and rds files in R
+* Importing/exporting tables from or to Dbeaver/R
+* Plotting with ggplot function 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

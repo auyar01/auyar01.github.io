@@ -1,0 +1,13 @@
+
+# My CV with `vitae` R package
+
+```{r CV, echo=F, out.width="100%", out.height=1000}
+knitr::include_graphics('Data/mycv.pdf')
+```
+
+## Script
+The script I have used for creating this CV can be seen [here](https://github.com/auyar01/Portfolio_opdrachten/blob/main/Scripts/CV.Rmd) on my github.
+
+## Credits
+I have used the `vitae` package for this. [This](https://github.com/mitchelloharawild/vitae) is the github page of the creator of this R package
+

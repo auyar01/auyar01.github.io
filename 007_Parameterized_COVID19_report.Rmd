@@ -1,0 +1,57 @@
+# Parameterized COVID-19 report
+
+This is a report with three parameters. Parameters are `country`, `year` and `month`. After knitting this Rmarkdown with parameters two plots are generated, one with covid deaths, and one with covid cases in specified country, year and month.
+
+We start with loading the required libraries 
+
+```{r loading libraries, message=F}
+library(tidyverse)
+library(readr)
+library(stringr)
+library(tibble)
+
+```
+
+Reading the data from opendata.ecdc.europa.eu, and processing it.
+
+```{r reading datafile and manipulating data}
+
+# Reading data
+data <- read.csv("https://opendata.ecdc.europa.eu/covid19/nationalcasedeath_eueea_daily_ei/csv", na.strings = "", fileEncoding = "UTF-8-BOM")
+
+# Tibble for converting monthnumber to monthname 
+months <- tibble(nr = c(1:12), name = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
+
+# Conversion monthnumber to name
+month <- months[params$month, "name"] %>% as.character()
+
+# Filtering data for specified country, year and month in parameters.
+country <- data %>% filter(countriesAndTerritories == params$country , year == as.integer(params$year) , month == params$month)
+
+# Formatting column dateRep as a date.
+country$dateRep <- as.Date(country$dateRep, format = "%d/%m/%Y")
+
+```  
+
+
+In chunk below two plots are visible. One for COVID-19 cases in  `r params$country` in `r month` of `r params$year`. And one for COVID-19 deaths,
+
+```{r plotting}
+country %>% ggplot(aes(x = dateRep, y = cases)) + geom_point() + geom_line() + theme_bw() + 
+  labs(title = paste0(params$country, " COVID-19 cases in ",month, " of ", params$year),
+       x = "Date",
+       y = "Cases")
+
+
+country %>% ggplot(aes(x = dateRep, y = deaths)) + geom_point() + geom_line() + theme_bw() + labs(title = paste0(params$country, " COVID-19 deaths in ",month, " of ", params$year),
+       x = "Date",
+       y = "Deaths")
+
+```
+
+
+
+
+
+
+

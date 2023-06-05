@@ -1,24 +1,27 @@
 # Folder structures
 
-```{r afbeeldingen inladen}
+In this report im showing my folder structure for the courses Data analysis using R part 2, and the course workflows. These courses are from a data science for biology track I have followed. 
+
+
+```{r loading libraries and figures, message = F}
 library(png)
 library(grid)
 library(gridExtra)
 library(here)
 
-
-daur2_fs <- rasterGrob(as.raster(readPNG(here("./Figures/DAUR2_fs.png"))))
-workflows_fs <-  rasterGrob(as.raster(readPNG(here("./Figures/workflows_fs_.png"))))
+# I have used the fs package for creating these figures, in particular the dir_tree() function.
+daur2_fs <- rasterGrob(as.raster(readPNG(here("Figures/DAUR2_fs.png"))))
+workflows_fs <-  rasterGrob(as.raster(readPNG(here("Figures/workflows_fs_.png"))))
 ```
 
 
 ## Folder structure of DAUR2:
-```{r daur2 fs}
+```{r}
 grid.arrange(daur2_fs)
 ```
 
 
 ## Folder structure of workflows (at time of making folder structure):
-```{r workflows fs}
+```{r}
 grid.arrange(workflows_fs)
 ```

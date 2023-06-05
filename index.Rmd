@@ -6,8 +6,15 @@ documentclass: book
 output:
   bookdown::gitbook:
     number_sections: true
-new_session: yes
+params: 
+  password: ""
+  country: ""
+  year: ""
+  month: ""
+bibliography: bibliography.bib
 ---
 
-# Portfolio opdrachten bookdown
+# Introduction to my portfolio
+
+This is my portfolio showcasing skills I have acquired during a course "Workflows" in a data sciences for biology track in the form of a bookdown.  
 

@@ -1,0 +1,39 @@
+# Plan on learning beginning steps of scRNA-seq analysis
+
+For the workflows course in the track data science for biology we have been assigned around 32 hours to develop a new skill. In one of the courses we were taught how to analyse data from a bulk RNA-seq experiment. 
+
+Here I am trying to learn how to do the beginning steps of analysing data from a single cell RNA-seq experiment
+
+I have made a planning on how to spend my time trying to learn this new skill, which can be seen here: 
+
+```{r tibble planning, include=F,message=F}
+library(tidyverse)
+planning <- tibble(Days = c(1, 2,3,4), 
+                   Action = c("Reading about single-cell RNA-seq, and finding a dataset that can be used.", "Loading in the data and downloading the required packages + filter data and obtain count matrix.", "Visualising/analyzing the data (DGE)", "See what else can be added, and adjust lay-out of graphs and Rmarkdown accordingly.")
+)
+```
+
+
+```{r planning, echo=F}
+knitr::kable(planning, caption = "Table 1: My planning for learning to analyse scRNA-seq")
+```
+Figure 1: Planning for learning scRNA-seq
+Days	Action
+Day 1	Reading about single-cell RNA-seq, and finding a dataset that can be used.
+Day 2	Loading in the data and downloading the required packages + filter data and obtain count matrix.
+Day 3	Visualising/analyzing the data (DGE)
+Day 4	Adjust lay-out accordingly, and see what else can be added.
+
+
+
+
+useful [source](https://www.singlecellcourse.org/index.html) for learning analysis of scRNA-seq. [github page](https://github.com/cellgeni/scRNA.seq.course)
+
+
+[useful](https://www.youtube.com/@Seurat_Scanpy_Signac/videos)
+
+[also useful](https://biostatsquid.com/scrnaseq-preprocessing-workflow-seurat/)
+
+[geo dataset](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE22669)
+
+
