@@ -8,7 +8,11 @@ folder-structure-of-workflows-at-time-of-making-folder-structure
 my-cv-with-vitae-r-package
 script
 credits
-plan-on-learning-beginning-steps-of-scrna-seq-analysis
+orientation-for-a-new-skill
+looking-ahead
+first-steps
+scrna-analysis-beginning-steps-using-cell-ranger-and-seurat
+credits-1
 sql-and-relational-database-in-dbeaver
 summary-of-showcased-skills
 parameterized-covid-19-report

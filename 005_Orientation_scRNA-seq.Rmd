@@ -1,0 +1,260 @@
+# Orientation for a new skill
+
+## Looking ahead
+
+In about 2 years, I hope to be working in a laboratory where NGS-experiments are done. 
+A couple weeks ago, I heard back from GenDx (Utrecht, The Netherlands) at which I applied for, for an internship place. Reply was positive and I can start interning starting in September.
+GenDx is a company where NGS-experiments are done on a regular basis. So in regards to my goal, I think I am doing good. 
+
+For the workflows course in the track data science for biology we have been assigned around 32 hours to develop a new skill. In one of the courses we were taught how to analyse data from a bulk RNA-seq experiment. 
+
+A next skill to learn would be how to do the beginning steps of analysing data from a single cell RNA-seq experiment, starting from fastq files.
+
+I have made a planning on how to spend my time trying to learn this new skill, which can be seen here: 
+
+```{r tibble planning, include=F,message=F}
+library(tidyverse)
+planning <- tibble(Days = c(1, 2,3,4), 
+                   Action = c("Reading about single-cell RNA-seq, and trying to find tutorials.", "Finding dataset,  loading in the data and downloading the required packages", "Filter data and obtain count matrix", "Try basic visualisations")
+)
+```
+
+
+```{r planning, echo=F}
+knitr::kable(planning, caption = "My planning for learning to do the beginning steps of scRNA-seq analysis")
+```
+
+## First steps 
+
+My first step was reading up on scRNA-seq. I have found a useful course on scRNA-seq that can be found [here](https://www.singlecellcourse.org/index.html). According to this course, Cell Ranger is the default tool for processing 10x Genomics scRNAseq data. So this is what I will be using first. Afterwards I am planning on using Seurat to do basic quality control and filtering. I have also found a geo dataset I can use [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE132771).
+
+
+
+
+## scRNA analysis beginning steps, using Cell ranger and Seurat   
+
+(I haven't ran the bash scripts, because I don't have a linux OS which is required for Cell ranger, and according to 10x genomics the minimum [requirements](https://support.10xgenomics.com/single-cell-gene-expression/software/overview/system-requirements#:~:text=Cell%20Ranger%20pipelines%20run%20on,1TB%20free%20disk%20space) include 1TB of free disk space and 64GB of RAM, which I don't have.)   
+
+````{bash, eval = F}
+# Downloading SRA-toolkit
+wget --output-document sratoolkit.tar.gz https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz
+
+# Extracting content SRA-toolkit
+tar -vxzf sratoolkit.tar.gz
+```
+
+```{bash, eval = F}
+# Downloading the fastq files
+#!/bin/bash
+fastq-dump SRR9304760 # Sample: Negative control 1 
+fastq-dump SRR9304761 
+
+fastq-dump SRR9304764 # Sample: Negative control 2
+fastq-dump SRR9304765 
+
+fastq-dump SRR9304770 # Sample: Negative control 3
+fastq-dump SRR9304771
+fastq-dump SRR9304772
+fastq-dump SRR9304773
+
+
+# Move fastq files to folders sample_NC1, sample_NC2 and sample_NC3
+```
+
+```{bash, eval = F}
+# Downloading Cell ranger 
+curl -o cellranger-7.1.0.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-7.1.0.tar.gz?Expires=1686048220&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZi4xMHhnZW5vbWljcy5jb20vcmVsZWFzZXMvY2VsbC1leHAvY2VsbHJhbmdlci03LjEuMC50YXIuZ3oiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE2ODYwNDgyMjB9fX1dfQ__&Signature=htIYtjO0vxujG1KRKghHR9ztOY4KzeAbIA2zgHeohWdC07N382BFub53plHzSOHX5mQhPxvKMkFuOauGiHqjA5RYBH8oUK1h6Z8uwq4SSpMq5JPOGAZIly5~GwxR6f96W1UOsYIr2ELvxxNGhLtuRDVEsPPfRLWA~JSyhwIzwA1f4AzYGK0CjUbvrM7qjR~fD8rzI7qYzmcwKu9TLTc~MASDkWAo2wAkj5RJJcxn63y~u86MgKfVbQVsBIDa1VQQgudhh4fl0261SvS695taleZJASLwJVmZ6W01iekOX77X2ejb24Ml6pE38gGvpXITtq0DB5cZz1D~-FUXC6Ui-Q__&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA"
+
+
+# Downloading human reference genome (Only using data from human)
+curl -O https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
+
+# Extracting Cell ranger 
+tar -xf cellranger-7.1.0.tar.gz
+
+# Extracting reference genome
+tar -xf refdata-gex-GRCh38-2020-A.tar.gz
+
+```
+
+```{bash, eval = F}
+
+# Using Cell ranger count for making raw count matrix sample nc1 : --id for which folder to output matrix to, --transcriptome is for folder in which the reference genome is in, --fastqs is the folder with the fastq files. --sample is sample prefix, --expect-cells is how many cells the experiment designers aimed for.
+cellranger-7.1.0/cellranger count --id NML1 --transcriptome refdata-gex-GRCh38-2020-A/ --fastqs sample_nc1/ --sample nc1 --expect-cells 10000 
+
+# for sample nc2
+cellranger-7.1.0/cellranger count --id NML2 --transcriptome refdata-gex-GRCh38-2020-A/ --fastqs sample_nc2/ --sample nc2 --expect-cells 10000 
+
+# for sample nc3 
+cellranger-7.1.0/cellranger count --id NML3 --transcriptome refdata-gex-GRCh38-2020-A/ --fastqs sample_nc3/ --sample nc3 --expect-cells 10000 
+
+```
+
+
+At this point I am actually running the code, I have obtained the raw count matrices, the genes and the barcodes that should result from these bash scripts from geo accession number [GSE132771](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE132771). In which, among other things, healthy lung tissue is used. I have only used the data for healthy lung tissue here.
+
+
+```{r, message = F}
+library(Seurat)
+library(tidyverse)
+library(ggpubr)
+library(here)
+```
+
+
+```{r reading data}
+# nc stand for negative control
+nc1 <- Read10X(data.dir = here("Data/GSE132771_RAW/NML1/"))
+nc2 <- Read10X(data.dir = here("Data/GSE132771_RAW/NML2/"))
+nc3 <- Read10X(data.dir = here("Data/GSE132771_RAW/NML3/"))
+```
+
+
+```{r creating Seurat objects and merging them, warning = F}
+
+# Make Seurat objects of the three datasets, min.cells = 3 so at least 3 cells contain the same gene (feature), min.features is set to 200 so only cells where at least 200 genes were detected are used for the object.
+nc1 <- CreateSeuratObject(counts = nc1, project = "nc1", min.cells = 3, min.features = 200)
+
+nc2 <- CreateSeuratObject(counts = nc2, project = "nc2", min.cells = 3, min.features = 200)
+
+nc3 <- CreateSeuratObject(counts = nc3, project = "nc3", min.cells = 3, min.features = 200)
+
+
+# Merge the objects
+merged_nc <- merge(nc1, y = c(nc2, nc3), add.cell.ids = c("nc1","nc2","nc3"), project = "merged_nc"
+)
+
+```
+
+```{r adding to metadata and violin plot, warning = F}
+
+# In metadata, store a column for percentage of genes that are mitochondrial genes.
+merged_nc <- PercentageFeatureSet(merged_nc, pattern = "^MT-", col.name = "percent.mt")
+
+# And adding percentage ribosomal proteins (names begin with RPS or RPL).
+merged_nc <- PercentageFeatureSet(merged_nc, pattern = "^RP[SL]", col.name = "percent.rb")
+
+# Right now, in metadata, each cell has 5 fields. These are:
+# 1: orig.ident (dataset ID)
+# 2: nCount_RNA (number of UMI reads detected per cell)
+# 3: nFeature_RNA (number of expressed genes, that are detected, per cell)
+# 4: percent.mt (percentage mitochondrial genes)
+# 5: percent.rb (percentage ribosomal genes)
+head(merged_nc@meta.data)
+
+# Inspecting the ranges of nFeatures_RNA, nCount_RNA and percent.mt
+range(merged_nc$nFeature_RNA)
+range(merged_nc$nCount_RNA)
+range(merged_nc$percent.mt)
+
+# Visualise nFeature, nCount, percent.mt and percent.rb in violin plot 
+VlnPlot(merged_nc, features = c("nFeature_RNA","nCount_RNA","percent.mt","percent.rb"), ncol = 4, pt.size = .1)
+
+```
+```{r correlation plots nCount_RNA and percent.mt}
+# subsetting each sample
+subset_nc1 <-  subset(merged_nc, idents = "nc1")
+subset_nc2 <-  subset(merged_nc, idents = "nc2")
+subset_nc3 <-  subset(merged_nc, idents = "nc3")
+
+# Correlation between nCount_RNA and percent.mt (number on top is Pearson's r correlation)
+cor1_1 <- FeatureScatter(subset_nc1, feature1 = "nCount_RNA", feature2 = "percent.mt")
+cor2_1 <- FeatureScatter(subset_nc2, feature1 = "nCount_RNA", feature2 = "percent.mt")
+cor3_1 <- FeatureScatter(subset_nc3, feature1 = "nCount_RNA", feature2 = "percent.mt")
+cor4_1 <- FeatureScatter(merged_nc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+
+ggarrange(cor1_1, cor2_1, cor3_1, cor4_1)
+```
+
+MT percentage negatively correlates with nCount_RNA.(except for nc2). So a higher MT percentage equals a lower UMI-count. (indicates death of a cell)
+
+
+```{r correlation plots nCount_RNA and nFeature_RNA}
+
+# Correlation between nCount_RNA and nFeature_RNA 
+cor1_2 <- FeatureScatter(subset_nc1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+cor2_2 <- FeatureScatter(subset_nc2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+cor3_2 <- FeatureScatter(subset_nc3, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+cor4_2 <- FeatureScatter(merged_nc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+ggarrange(cor1_2, cor2_2, cor3_2, cor4_2)
+```
+
+
+```{r correlation plots nCount_RNA and percent.rb}
+
+# Correlation between nCount_RNA and percent.rb 
+cor1_3 <- FeatureScatter(subset_nc1, feature1 = "nCount_RNA", feature2 = "percent.rb")
+cor2_3 <- FeatureScatter(subset_nc2, feature1 = "nCount_RNA", feature2 = "percent.rb")
+cor3_3 <- FeatureScatter(subset_nc3, feature1 = "nCount_RNA", feature2 = "percent.rb")
+cor4_3 <- FeatureScatter(merged_nc, feature1 = "nCount_RNA", feature2 = "percent.rb")
+
+ggarrange(cor1_3,cor2_3,cor3_3,cor4_3)
+
+```
+
+```{r correlation plots percent.rb and percent.mt}
+
+# Correlation between percent.rb and percent.mt 
+cor1_4 <- FeatureScatter(subset_nc1, feature1 = "percent.rb", feature2 = "percent.mt")
+cor2_4 <- FeatureScatter(subset_nc2, feature1 = "percent.rb", feature2 = "percent.mt")
+cor3_4 <- FeatureScatter(subset_nc3, feature1 = "percent.rb", feature2 = "percent.mt")
+cor4_4 <- FeatureScatter(merged_nc, feature1 = "percent.rb", feature2 = "percent.mt")
+
+ggarrange(cor1_4,cor2_4,cor3_4,cor4_4)
+```
+
+It seems that MT percentage has a slightly negative correlation with percent.rb (except for nc2). This would indicate that high ribosomal protein content seems to contain biological signal
+
+
+```{r filtering out low quantity cells + violin plot}
+# Getting rid of low quantity cells 
+merged_nc <- subset(merged_nc, subset = nFeature_RNA > 500 & nFeature_RNA < 4000 & nCount_RNA < 20000 & percent.mt < 10)
+
+# Visualise again after filtering
+VlnPlot(merged_nc, features = c("nFeature_RNA","nCount_RNA","percent.mt", "percent.rb"), ncol = 4, pt.size = .1)
+
+
+```
+
+
+
+```{r normalising data, selecting highly variable features, plotting them,  warning = F, message=F}
+
+# Normalising data, this is done to account for sequencing depth. Conventional way of doing is to scale it to 10000, and use log2 on the obtained values.
+merged_nc <- NormalizeData(merged_nc, normalization.method = "LogNormalize", scale.factor = 10000)
+
+# Selecting highly variable features, selection method is variance stabilising transformation
+merged_nc <- FindVariableFeatures(merged_nc, selection.method = "vst", nfeatures = 2000)
+
+# Selecting top 10 most highly variable genes (most interesting for downstream analysis)
+top10 <-  head(VariableFeatures(merged_nc),10)
+
+
+# Plotting highly variable features (top 10 with labels)
+vfplot <- VariableFeaturePlot(merged_nc)
+LabelPoints(plot = vfplot, points = top10, repel = TRUE, xnudge = 0, ynudge = 0)
+
+```
+
+
+
+
+
+
+
+<br>
+<br>
+<br>
+
+## Credits
+* [Sanbomic's Cell ranger explanation](https://www.youtube.com/watch?v=6heXkouNZpk)
+* [scRNA-seq analyzing course](https://www.singlecellcourse.org/index.html)
+* [Single Cell Genomics, Transcriptomics & Proteomics channel](https://www.youtube.com/@Seurat_Scanpy_Signac/videos)
+
+
+
+
+
+
+
