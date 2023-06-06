@@ -1,0 +1,37 @@
+# `simplefunctions` R package
+
+Simplefunctions is an R package consisting of four functions that I have made. The functions are really basic and quite specific. The functions are:
+
+* Function 1: `get_date()`
+* Function 2: `disease_count()`
+* Function 3: `plot_cases()`
+* Function 4: `load_image()`
+
+These functions are explained with examples [here](https://github.com/auyar01/simplefunctions) on my github page. I will also give short descriptions of what these functions do.
+
+The package also comes with 2 datasets named `flu_cases` and `dengue_cases`. With `flu_cases` showing the estimated flu cases for different countries per year, and `dengue_cases` showing the same thing, but for estimated dengue cases. Use `?flu_cases` and `?dengue_cases` after installation for the documentation of these datasets.
+
+
+## Installation
+
+You can install the development version of simplefunctions from [GitHub](https://github.com/auyar01) with: 
+
+``` r
+# install.packages("devtools")
+devtools::install_github("auyar01/simplefunctions", build_vignettes = TRUE)
+```
+
+
+## Function 1: `get_date()`
+
+When a dataframe contains a column with dates in yyyy/mm/dd format, this function can be used to get only the years, months or days. I have used the code of this function to get the years for my datasets (`dengue_cases` and `flu_cases`). 
+
+## Function 2: `disease_count()`
+This function counts the total amount of cases of dengue or flu in a country throughout the years. This function is fairly specific for the 2 datasets in this package.
+
+## Function 3: `plot_cases()`
+This function plots a line graph of dengue/flu cases throughout the years in different countries. It uses all the countries in the dataframe, so it is best used after filtering for only the countries you want.
+
+## Function 4: `load_image()`
+This function is not really related to previous functions. This one’s just for loading an image by giving the path to the file.
+

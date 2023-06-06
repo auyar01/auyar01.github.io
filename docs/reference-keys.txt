@@ -12,6 +12,12 @@ plan-on-learning-beginning-steps-of-scrna-seq-analysis
 sql-and-relational-database-in-dbeaver
 summary-of-showcased-skills
 parameterized-covid-19-report
+simplefunctions-r-package
+installation
+function-1-get_date
+function-2-disease_count
+function-3-plot_cases
+function-4-load_image
 zotero-for-references
 introduction-to-projecticum
 references
