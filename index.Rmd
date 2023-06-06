@@ -12,6 +12,7 @@ params:
   year: ""
   month: ""
 bibliography: bibliography.bib
+link-citations: true
 ---
 
 # Introduction to my portfolio
